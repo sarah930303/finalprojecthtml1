@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>訂單完成</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fdf6f0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    nav, footer {
+      background-color: #a9805b;
+      color: white;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    nav a, footer a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .container {
+      flex: 1;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .success-icon {
+      font-size: 64px;
+      color: #4BB543;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #774b30;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 18px;
+      color: #444;
+      margin-bottom: 20px;
+    }
+    .btn-group a {
+      background-color: #a9805b;
+      color: white;
+      padding: 12px 24px;
+      margin: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s ease;
+    }
+    .btn-group a:hover {
+      background-color: #9f5933;
+    }
+    footer {
+      text-align: center;
+      flex-direction: column;
+    }
+    footer .social-links {
+      margin-bottom: 10px;
+    }
+    footer small {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div><strong>公主漢堡</strong></div>
+    <div>
+      <a href="index.html"><i class="fa-solid fa-house-user"></i> 首頁</a>
+      <a href="cart.html"><i class="fa-solid fa-shopping-cart"></i> 購物車</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+    <h1>訂單已成功送出！</h1>
+    <p id="delivery-time">將於 <strong>指定時間</strong> 交貨</p>
+    <p>感謝您的訂購，我們會盡快為您處理。<br>祝您有美好的一天！</p>
+    <p id="countdown">將於 <strong>5</strong> 秒後自動返回首頁…</p>
+    <div class="btn-group">
+      <a href="index.html">回到首頁</a>
+      <a href="products.html">繼續購物</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="social-links">
+      <a href="#"><i class="fa-brands fa-facebook fa-fw"></i> Facebook</a>
+      <a href="#"><i class="fa-brands fa-twitter fa-fw"></i> Twitter</a>
+      <a href="#"><i class="fa-brands fa-youtube fa-fw"></i> YouTube</a>
+      <a href="#"><i class="fa-brands fa-instagram fa-fw"></i> Instagram</a>
+    </div>
+    <small>Copyright © 公主漢堡</small>
+  </footer>
+
+  <script>
+    // ✅ 清空購物車
+    localStorage.removeItem('cart');
+
+    // ✅ 顯示取貨時間
+    const date = localStorage.getItem('pickupDate');
+    if (date) {
+      document.getElementById('delivery-time').innerHTML = `將於 <strong>${date}</strong> 交貨`;
+      localStorage.removeItem('pickupDate');
+    }
+
+    // ✅ 自動跳轉倒數
+    let seconds = 5;
+    const countdownEl = document.getElementById('countdown').querySelector('strong');
+    const interval = setInterval(() => {
+      seconds--;
+      countdownEl.textContent = seconds;
+      if (seconds === 0) {
+        clearInterval(interval);
+        window.location.href = 'index.html';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

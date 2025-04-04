@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>購物車</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fdf6f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header, footer {
+      background-color: #a9805b;
+      color: white;
+      padding: 20px 40px;
+      text-align: center;
+    }
+    main {
+      flex: 1;
+      padding: 40px;
+    }
+    h1 {
+      color: #774b30;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #debd94;
+      color: #333;
+    }
+    td img {
+      width: 100px !important;
+      height: auto !important;
+      max-height: 100px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+    .total {
+      text-align: right;
+      font-size: 20px;
+      margin-top: 20px;
+      color: #f58322;
+    }
+    .checkout-btn {
+      margin-top: 30px;
+      padding: 14px 28px;
+      background-color: #a9805b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .checkout-btn:hover {
+      background-color: #9f5933;
+    }
+  </style>
+</head>
+<body>
+  <nav style="width: 100%; background-color: #a9805b; color: white; display: flex; justify-content: space-between; align-items: center; padding: 14px 40px; font-size: 18px;">
+    <div class="left-nav">
+      <form>
+        <input type="search" placeholder="Search" aria-label="Search" style="padding: 8px; border-radius: 4px; border: none; font-size: 16px;" />
+      </form>
+    </div>
+    <div class="right-nav" style="display: flex; gap: 24px;">
+      <a href="#" style="color: white; text-decoration: none;"><i class="fa-solid fa-house-user fa-fw"></i> 產品購買</a>
+      <a href="#" style="color: white; text-decoration: none;"><i class="fa-solid fa-thumbs-up fa-fw"></i> 登入</a>
+      <a href="#" style="color: white; text-decoration: none;"><i class="fa-solid fa-shopping-cart fa-fw"></i> 購物車</a>
+    </div>
+  </nav>
+  <main>
+    <h1>商品清單</h1>
+    <table id="cart-table">
+      <thead>
+        <tr>
+          <th>商品圖片</th>
+          <th>商品</th>
+          <th>單價</th>
+          <th>數量</th>
+          <th>小計</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="cart-body">
+        <!-- 動態插入商品列 -->
+      </tbody>
+    </table>
+    <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 20px; gap: 20px;">
+      <div class="total">總金額：NT$<span id="total-price">0</span></div>
+      <button class="checkout-btn" onclick="checkout()">送出訂單</button>
+    </div>
+  </main>
+  <footer>
+    <div style="margin-bottom: 10px;">
+      <a href="https://www.facebook.com/mosburger/?locale=ja_JP" style="color:white; margin: 0 10px;"><i class="fa-brands fa-facebook fa-fw fa-2x"></i> facebook</a>
+      <a href="https://twitter.com/mos_burger" style="color:white; margin: 0 10px;"><i class="fa-brands fa-twitter fa-fw fa-2x"></i> twitter</a>
+      <a href="https://www.youtube.com/@mosburgerOfficial" style="color:white; margin: 0 10px;"><i class="fa-brands fa-youtube fa-fw fa-2x"></i> YouTube</a>
+      <a href="https://www.instagram.com/mosburger_japan/" style="color:white; margin: 0 10px;"><i class="fa-brands fa-instagram-square fa-fw fa-2x"></i> Instagram</a>
+    </div>
+    <h6 style="font-weight: normal;">Copyright © 公主漢堡</h6>
+  </footer>
+  <script>
+    const cartBody = document.getElementById('cart-body');
+    const totalPriceEl = document.getElementById('total-price');
+  
+    function loadCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      let total = 0;
+      cartBody.innerHTML = '';
+  
+      cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        const row = `<tr>
+          <td><img src="${item.image}" alt="${item.name}"></td>
+          <td>${item.name} <br><small></small></td>
+          <td>NT$${item.price}</td>
+          <td>
+            <input type="number" min="1" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" style="width:60px; text-align:center;" />
+          </td>
+          <td>NT$${subtotal}</td>
+          <td><button onclick="removeItem(${item.id})">刪除</button></td>
+        </tr>`;
+        cartBody.insertAdjacentHTML('beforeend', row);
+      });
+  
+      totalPriceEl.textContent = total;
+    }
+  
+    function removeItem(id) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart = cart.filter(item => item.id !== id);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      loadCart();
+    }
+  
+    function updateQuantity(id, quantity) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart = cart.map(item => {
+        if (item.id === id) item.quantity = parseInt(quantity);
+        return item;
+      });
+      localStorage.setItem('cart', JSON.stringify(cart));
+      loadCart();
+    }
+  
+    function checkout() {
+      window.location.href = 'ProductListingPage.html'; // ✅ 自動跳轉
+    }
+  
+    loadCart();
+  </script>
+  
+</body>
+</html>

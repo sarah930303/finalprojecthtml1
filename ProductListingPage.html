@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>填寫訂單資訊</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fdf6f0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    nav, footer {
+      background-color: #a9805b;
+      color: white;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    nav a, footer a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .container {
+      flex: 1;
+      width: 600px;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin: 40px auto;
+      box-sizing: border-box;
+    }
+    h2 {
+      text-align: center;
+      color: #774b30;
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #774b30;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    .hidden {
+      display: none;
+    }
+    #bankInfo {
+      background-color: #fff6e6;
+      padding: 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    .summary {
+      margin-top: 20px;
+      background: #fff6e6;
+      padding: 15px;
+      border-radius: 8px;
+      color: #774b30;
+    }
+    button {
+      background-color: #a9805b;
+      color: white;
+      padding: 12px;
+      width: 100%;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #9f5933;
+    }
+    footer {
+      text-align: center;
+      flex-direction: column;
+    }
+    footer .social-links {
+      margin-bottom: 10px;
+    }
+    footer small {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div><strong>公主漢堡</strong></div>
+    <div>
+      <a href="index.html"><i class="fa-solid fa-house-user"></i> 首頁</a>
+      <a href="cart.html"><i class="fa-solid fa-shopping-cart"></i> 購物車</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2>填寫訂單資訊</h2>
+    <form id="orderForm">
+      <label for="name">訂購人姓名</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="phone">電話</label>
+      <input type="tel" id="phone" name="phone" required>
+
+      <label for="payment">付款方式</label>
+      <select id="payment" name="payment">
+        <option value="cash">現金付款</option>
+        <option value="bank">匯款</option>
+      </select>
+
+      <div id="bankInfo" class="hidden">
+        <p style="color:#774b30; margin-bottom: 10px;">請匯款至：123-456-789000 中華銀行</p>
+        <label for="accountLast5">帳號後五碼</label>
+        <input type="text" id="accountLast5" maxlength="5">
+      </div>
+
+      <label for="method">取貨方式</label>
+      <select id="method" name="method">
+        <option value="pickup">門市面交</option>
+        <option value="delivery">外送</option>
+      </select>
+
+      <label for="date">選擇取貨日期</label>
+      <input type="date" id="date" name="date" required>
+
+      <div class="summary" id="orderSummary"></div>
+
+      <button type="submit">送出訂單</button>
+    </form>
+  </div>
+
+  <footer>
+    <div class="social-links">
+      <a href="#"><i class="fa-brands fa-facebook fa-fw"></i> Facebook</a>
+      <a href="#"><i class="fa-brands fa-twitter fa-fw"></i> Twitter</a>
+      <a href="#"><i class="fa-brands fa-youtube fa-fw"></i> YouTube</a>
+      <a href="#"><i class="fa-brands fa-instagram fa-fw"></i> Instagram</a>
+    </div>
+    <small>Copyright © 公主漢堡</small>
+  </footer>
+
+  <script>
+    const paymentSelect = document.getElementById('payment');
+    const bankInfo = document.getElementById('bankInfo');
+    const orderSummary = document.getElementById('orderSummary');
+  
+    paymentSelect.addEventListener('change', () => {
+      bankInfo.classList.toggle('hidden', paymentSelect.value !== 'bank');
+    });
+  
+    function renderSummary() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (cart.length === 0) {
+        orderSummary.innerHTML = '<p>購物車為空。</p>';
+        return;
+      }
+      let html = '<strong>商品清單：</strong><ul style="padding-left: 20px; margin-top: 8px;">';
+      let total = 0;
+      cart.forEach(item => {
+        html += `<li>${item.name} × ${item.quantity} = NT$${item.price * item.quantity}</li>`;
+        total += item.price * item.quantity;
+      });
+      html += `</ul><p><strong>總金額：</strong>NT$${total}</p>`;
+      orderSummary.innerHTML = html;
+    }
+  
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+  
+      const pickupDate = document.getElementById('date').value;
+      localStorage.setItem('pickupDate', pickupDate); // ✅ 儲存取貨日期給 success.html 使用
+  
+      alert("✅ 訂單資料已送出，準備導向訂單完成頁面...");
+      setTimeout(() => {
+        window.location.href = 'sucess.html';
+      }, 1000);
+    });
+  
+    renderSummary();
+  </script>
+  
+</body>
+</html>
